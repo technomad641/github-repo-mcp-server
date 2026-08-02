@@ -4,6 +4,7 @@ import { z } from "zod";
 import { registerGetRepoTool } from "./github/tools/getRepo.js";
 import { registerListReposTool } from "./github/tools/listRepos.js";
 import { registerListBranchesTool } from "./github/tools/listBranches.js";
+import { registerListCommitsTool } from "./github/tools/listCommits.js";
 
 const server = new McpServer({
   name: "github-repo-mcp-server",
@@ -13,6 +14,7 @@ const server = new McpServer({
 registerGetRepoTool(server);
 registerListReposTool(server);
 registerListBranchesTool(server);
+registerListCommitsTool(server);
 
 // M0 placeholder tool: proves the server boots and responds over stdio.
 // Replaced by real GitHub-backed tools starting in M1.

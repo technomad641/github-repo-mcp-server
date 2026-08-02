@@ -8,14 +8,14 @@ See [SPEC.md](./SPEC.md) for the full design and development plan.
 
 ## Status
 
-🚧 Under active development, built milestone by milestone. Current: **M4 — resources**.
+🚧 Under active development, built milestone by milestone. Current: **M5 — prompts**.
 
 - [x] M0 — Project scaffold: TypeScript + MCP SDK, minimal `ping` tool over stdio
 - [x] M1 — GitHub client + config (Octokit auth, repo allowlist)
 - [x] M2 — Tier 1 read-only personal-repo tools (12 tools)
 - [x] M3 — `search_trending_repos` discovery tool
 - [x] M4 — MCP resources (README, issue/PR content)
-- [ ] M5 — MCP prompts (reusable templates)
+- [x] M5 — MCP prompts (reusable templates)
 - [ ] M6 — Tests, hardening, docs
 
 ## Requirements
@@ -59,6 +59,14 @@ GitHub data rather than a specific repo.
 | `repo://{owner}/{repo}/pulls/{number}` | PR title, description, diff stats |
 
 All allowlist-gated the same as the Tier 1 tools.
+
+## Prompts (M5)
+
+| Name | What it does |
+|---|---|
+| `summarize_prs_for_review` | Finds open PRs and summarizes which need attention |
+| `weekly_repo_digest` | Commits, issues, PRs, and CI status from the last week |
+| `whats_trending` | Trending public repos for a GitHub topic |
 
 ## Getting started
 

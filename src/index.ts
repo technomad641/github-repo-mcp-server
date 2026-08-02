@@ -14,6 +14,7 @@ import { registerSearchCodeTool } from "./github/tools/searchCode.js";
 import { registerGetWorkflowRunsTool } from "./github/tools/getWorkflowRuns.js";
 import { registerGetNotificationsTool } from "./github/tools/getNotifications.js";
 import { registerSearchTrendingReposTool } from "./github/tools/searchTrendingRepos.js";
+import { registerReadmeResource } from "./github/resources/readme.js";
 
 const server = new McpServer({
   name: "github-repo-mcp-server",
@@ -33,6 +34,7 @@ registerSearchCodeTool(server);
 registerGetWorkflowRunsTool(server);
 registerGetNotificationsTool(server);
 registerSearchTrendingReposTool(server);
+registerReadmeResource(server);
 
 // M0 placeholder tool: proves the server boots and responds over stdio.
 // Replaced by real GitHub-backed tools starting in M1.

@@ -9,6 +9,7 @@ import { registerGetFileContentsTool } from "./github/tools/getFileContents.js";
 import { registerListIssuesTool } from "./github/tools/listIssues.js";
 import { registerGetIssueTool } from "./github/tools/getIssue.js";
 import { registerListPullRequestsTool } from "./github/tools/listPullRequests.js";
+import { registerGetPullRequestTool } from "./github/tools/getPullRequest.js";
 
 const server = new McpServer({
   name: "github-repo-mcp-server",
@@ -23,6 +24,7 @@ registerGetFileContentsTool(server);
 registerListIssuesTool(server);
 registerGetIssueTool(server);
 registerListPullRequestsTool(server);
+registerGetPullRequestTool(server);
 
 // M0 placeholder tool: proves the server boots and responds over stdio.
 // Replaced by real GitHub-backed tools starting in M1.

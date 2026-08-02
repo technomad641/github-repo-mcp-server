@@ -8,13 +8,13 @@ See [SPEC.md](./SPEC.md) for the full design and development plan.
 
 ## Status
 
-🚧 Under active development, built milestone by milestone. Current: **M3 — trending discovery**.
+🚧 Under active development, built milestone by milestone. Current: **M4 — resources**.
 
 - [x] M0 — Project scaffold: TypeScript + MCP SDK, minimal `ping` tool over stdio
 - [x] M1 — GitHub client + config (Octokit auth, repo allowlist)
 - [x] M2 — Tier 1 read-only personal-repo tools (12 tools)
 - [x] M3 — `search_trending_repos` discovery tool
-- [ ] M4 — MCP resources (README, issue/PR content)
+- [x] M4 — MCP resources (README, issue/PR content)
 - [ ] M5 — MCP prompts (reusable templates)
 - [ ] M6 — Tests, hardening, docs
 
@@ -49,6 +49,16 @@ commit messages for what was and wasn't exercised against real data.
 
 `search_trending_repos` — not allowlist-gated, since it searches public
 GitHub data rather than a specific repo.
+
+## Resources (M4)
+
+| URI template | Content |
+|---|---|
+| `repo://{owner}/{repo}/readme` | The repo's README, as markdown |
+| `repo://{owner}/{repo}/issues/{number}` | Issue title, body, and comments |
+| `repo://{owner}/{repo}/pulls/{number}` | PR title, description, diff stats |
+
+All allowlist-gated the same as the Tier 1 tools.
 
 ## Getting started
 

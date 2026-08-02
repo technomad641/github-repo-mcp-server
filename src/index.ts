@@ -1,11 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { registerGetRepoTool } from "./github/tools/getRepo.js";
 
 const server = new McpServer({
   name: "github-repo-mcp-server",
   version: "0.1.0",
 });
+
+registerGetRepoTool(server);
 
 // M0 placeholder tool: proves the server boots and responds over stdio.
 // Replaced by real GitHub-backed tools starting in M1.

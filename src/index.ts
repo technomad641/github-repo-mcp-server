@@ -12,6 +12,7 @@ import { registerListPullRequestsTool } from "./github/tools/listPullRequests.js
 import { registerGetPullRequestTool } from "./github/tools/getPullRequest.js";
 import { registerSearchCodeTool } from "./github/tools/searchCode.js";
 import { registerGetWorkflowRunsTool } from "./github/tools/getWorkflowRuns.js";
+import { registerGetNotificationsTool } from "./github/tools/getNotifications.js";
 
 const server = new McpServer({
   name: "github-repo-mcp-server",
@@ -29,6 +30,7 @@ registerListPullRequestsTool(server);
 registerGetPullRequestTool(server);
 registerSearchCodeTool(server);
 registerGetWorkflowRunsTool(server);
+registerGetNotificationsTool(server);
 
 // M0 placeholder tool: proves the server boots and responds over stdio.
 // Replaced by real GitHub-backed tools starting in M1.

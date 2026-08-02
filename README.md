@@ -8,11 +8,11 @@ See [SPEC.md](./SPEC.md) for the full design and development plan.
 
 ## Status
 
-🚧 Under active development, built milestone by milestone. Current: **M1 — GitHub client + config**.
+🚧 Under active development, built milestone by milestone. Current: **M2 — Tier 1 tools**.
 
 - [x] M0 — Project scaffold: TypeScript + MCP SDK, minimal `ping` tool over stdio
 - [x] M1 — GitHub client + config (Octokit auth, repo allowlist)
-- [ ] M2 — Tier 1 read-only personal-repo tools
+- [x] M2 — Tier 1 read-only personal-repo tools (12 tools)
 - [ ] M3 — `search_trending_repos` discovery tool
 - [ ] M4 — MCP resources (README, issue/PR content)
 - [ ] M5 — MCP prompts (reusable templates)
@@ -32,6 +32,18 @@ See [SPEC.md](./SPEC.md) for the full design and development plan.
    the allowlist personal-scope tools are restricted to. The
    `search_trending_repos` tool (M3) is exempt, since it queries public
    GitHub data rather than a specific repo.
+3. `get_notifications` additionally needs the token's **Notifications**
+   *account* permission (separate section from repository permissions on
+   the token creation page) — every other tool works without it.
+
+## Tools (M2 — Tier 1, read-only)
+
+`get_repo`, `list_repos`, `list_branches`, `list_commits`,
+`get_file_contents`, `list_issues`, `get_issue`, `list_pull_requests`,
+`get_pull_request`, `search_code`, `get_workflow_runs`, `get_notifications`.
+
+Each was verified against a live repo during development; see individual
+commit messages for what was and wasn't exercised against real data.
 
 ## Getting started
 

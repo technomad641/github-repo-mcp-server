@@ -19,6 +19,7 @@ import { registerIssueResource } from "./github/resources/issue.js";
 import { registerPullRequestResource } from "./github/resources/pullRequest.js";
 import { registerReviewSummaryPrompt } from "./github/prompts/reviewSummary.js";
 import { registerWeeklyDigestPrompt } from "./github/prompts/weeklyDigest.js";
+import { registerTrendingTopicPrompt } from "./github/prompts/trendingTopic.js";
 
 const server = new McpServer({
   name: "github-repo-mcp-server",
@@ -43,6 +44,7 @@ registerIssueResource(server);
 registerPullRequestResource(server);
 registerReviewSummaryPrompt(server);
 registerWeeklyDigestPrompt(server);
+registerTrendingTopicPrompt(server);
 
 // M0 placeholder tool: proves the server boots and responds over stdio.
 // Replaced by real GitHub-backed tools starting in M1.

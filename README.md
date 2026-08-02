@@ -8,12 +8,12 @@ See [SPEC.md](./SPEC.md) for the full design and development plan.
 
 ## Status
 
-🚧 Under active development, built milestone by milestone. Current: **M2 — Tier 1 tools**.
+🚧 Under active development, built milestone by milestone. Current: **M3 — trending discovery**.
 
 - [x] M0 — Project scaffold: TypeScript + MCP SDK, minimal `ping` tool over stdio
 - [x] M1 — GitHub client + config (Octokit auth, repo allowlist)
 - [x] M2 — Tier 1 read-only personal-repo tools (12 tools)
-- [ ] M3 — `search_trending_repos` discovery tool
+- [x] M3 — `search_trending_repos` discovery tool
 - [ ] M4 — MCP resources (README, issue/PR content)
 - [ ] M5 — MCP prompts (reusable templates)
 - [ ] M6 — Tests, hardening, docs
@@ -44,6 +44,11 @@ See [SPEC.md](./SPEC.md) for the full design and development plan.
 
 Each was verified against a live repo during development; see individual
 commit messages for what was and wasn't exercised against real data.
+
+## Tools (M3 — global discovery)
+
+`search_trending_repos` — not allowlist-gated, since it searches public
+GitHub data rather than a specific repo.
 
 ## Getting started
 

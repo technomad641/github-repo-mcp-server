@@ -1,8 +1,16 @@
 import { Octokit } from "@octokit/rest";
+import { throttling } from "@octokit/plugin-throttling";
 
-let cachedClient: Octokit | null = null;
+const ThrottledOctokit = Octokit.plugin(throttling);
+type ThrottledOctokitInstance = InstanceType<typeof ThrottledOctokit>;
 
-export function getGitHubClient(): Octokit {
+let cachedClient: ThrottledOctokitInstance | null = null;
+
+// Max automatic retries before giving up and surfacing a clear rate-limit
+// error, instead of retrying forever (see SPEC.md non-functional requirements).
+const MAX_RATE_LIMIT_RETRIES = 1;
+
+export function getGitHubClient(): ThrottledOctokitInstance {
   if (cachedClient) return cachedClient;
 
   const token = process.env.GITHUB_TOKEN;
@@ -13,7 +21,19 @@ export function getGitHubClient(): Octokit {
     );
   }
 
-  cachedClient = new Octokit({ auth: token });
+  cachedClient = new ThrottledOctokit({
+    auth: token,
+    throttle: {
+      onRateLimit: (retryAfter, options, octokit, retryCount) => {
+        octokit.log.warn(`Rate limit hit for ${options.method} ${options.url}`);
+        return retryCount < MAX_RATE_LIMIT_RETRIES;
+      },
+      onSecondaryRateLimit: (retryAfter, options, octokit, retryCount) => {
+        octokit.log.warn(`Secondary rate limit hit for ${options.method} ${options.url}`);
+        return retryCount < MAX_RATE_LIMIT_RETRIES;
+      },
+    },
+  });
   return cachedClient;
 }
 

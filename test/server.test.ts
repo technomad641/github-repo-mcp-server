@@ -18,11 +18,17 @@ const mockOctokit = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@octokit/rest", () => ({
-  Octokit: vi.fn().mockImplementation(function MockOctokit() {
+vi.mock("@octokit/rest", () => {
+  const MockOctokitCtor = vi.fn().mockImplementation(function MockOctokit() {
     return mockOctokit;
-  }),
-}));
+  });
+  // client.ts calls Octokit.plugin(throttling) to compose the throttled
+  // client class - the mock just needs .plugin() to return something
+  // constructible, since the real throttling behavior isn't under test here.
+  (MockOctokitCtor as unknown as { plugin: () => typeof MockOctokitCtor }).plugin = () =>
+    MockOctokitCtor;
+  return { Octokit: MockOctokitCtor };
+});
 
 import { createTestClient } from "./testServer.js";
 

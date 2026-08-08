@@ -76,8 +76,39 @@ npm start       # run the compiled server
 ```
 
 The server communicates over stdio, following the MCP protocol — it's meant
-to be launched by an MCP-compatible host (e.g. Claude Code), not run
-standalone in a terminal.
+to be launched by an MCP-compatible host (e.g. Claude Code, Claude Desktop,
+Cursor), not run standalone in a terminal.
+
+## Manual testing with MCP Inspector
+
+[MCP Inspector](https://github.com/modelcontextprotocol/inspector) is the
+official visual testing tool for MCP servers — it gives you a web UI to
+browse every tool/resource/prompt and call them interactively, instead of
+hand-typing JSON-RPC.
+
+```bash
+npm run build   # inspector launches the compiled server, so build first
+npx @modelcontextprotocol/inspector@latest node --env-file=.env dist/index.js
+```
+
+This prints a local URL with an auth token pre-filled, e.g.:
+
+```
+MCP Inspector Web is up and running at:
+   http://localhost:6274?MCP_INSPECTOR_API_TOKEN=<token>
+```
+
+Open that URL (it also tries to open your browser automatically). From
+there you can call any tool with real arguments - e.g. `get_repo` with
+`owner: <your-username>`, `repo: <a-repo-in-your-allowlist>`, or
+`search_trending_repos` with `topic: machine-learning` - and see the live
+result. The token in the URL authenticates your session; treat it like a
+credential and don't share the link.
+
+Note: Inspector v2 lists Node 22+ as its required engine. It still runs
+fine on Node 20 (just an `EBADENGINE` warning, not a hard failure) - if you
+hit a real compatibility issue, `npm i -g n && n 22` (or your Node version
+manager's equivalent) resolves it.
 
 ## Testing
 

@@ -6,6 +6,79 @@ of trending repos by topic across public GitHub.
 
 See [SPEC.md](./SPEC.md) for the full design and development plan.
 
+## Why we built this
+
+This started as a learning project to understand MCP by actually building
+one, not just reading about it - so the goal was a server that (a) does
+something genuinely useful day to day, and (b) touches all three MCP
+primitives (tools, resources, prompts) instead of just tools, which is
+where most "hello world" MCP examples stop.
+
+GitHub was the right domain for that: it has a mature, well-documented,
+official REST API (no scraping, no unofficial endpoints, no partner
+approval needed to get started), it's something we already use constantly,
+and it naturally splits into two different trust boundaries worth
+modeling - *your own repos* (should be tightly scoped) vs. *public GitHub
+data at large* (fine to query more freely). That split became the
+project's actual design backbone: see [Architecture](#architecture) below.
+
+The specific tool set also traces back to a real question asked earlier in
+this project: *"what's trending in machine learning right now?"* Answering
+that honestly - GitHub's real Trending page has no API, and "trending in
+the US" isn't answerable at all since repos have no geography field - is
+what shaped `search_trending_repos` into an honest proxy instead of a
+fake exact match. That mix of "build the useful thing" and "be upfront
+about what's actually possible" carried through the rest of the tools too.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Host["MCP Host (Claude Code / Claude Desktop / Cursor)"]
+        AI["AI assistant"]
+    end
+
+    AI <-->|"JSON-RPC over stdio"| Server
+
+    subgraph Server["github-repo-mcp-server"]
+        direction TB
+        Tools["Tools (13)\npersonal-scope + search_trending_repos"]
+        Resources["Resources (3)\nrepo://.../readme, issues/{n}, pulls/{n}"]
+        Prompts["Prompts (3)\nreview summary, weekly digest, trending"]
+        Config["config.ts\nrepo allowlist"]
+        Client["client.ts\nOctokit + throttling"]
+
+        Tools --> Config
+        Resources --> Config
+        Tools --> Client
+        Resources --> Client
+        Prompts -.->|"instructs AI to call"| Tools
+    end
+
+    Client -->|"personal-scope calls\n(allowlist-gated)"| GH["GitHub REST API"]
+    Tools -->|"search_trending_repos\n(not allowlist-gated)"| GH
+
+    GH -->|"read-only, fine-grained PAT"| Repos[("Your repos\n+ public GitHub data")]
+```
+
+Two trust boundaries drive the whole design:
+
+- **Personal scope** — every tool that touches a specific repo
+  (`get_repo`, `list_issues`, `get_file_contents`, etc.) is checked against
+  `config.json`'s allowlist before it's allowed to run. A token scoped to
+  your repos plus code that enforces the allowlist means the server
+  physically cannot read a repo you didn't list, even if the AI asked it to.
+- **Global discovery** — `search_trending_repos` is deliberately exempt
+  from the allowlist, since it searches public GitHub data at large rather
+  than a specific repo. Same GitHub API, different trust model, so it's
+  routed differently in code, not just documented differently.
+
+Prompts sit a layer above both: they don't call GitHub directly, they
+return instructions telling the AI *which* tools to call and how to
+summarize the results - the same primitive as a saved prompt template a
+human would write, just server-hosted so every client that connects gets
+it for free.
+
 ## Status
 
 ✅ All planned milestones complete.
@@ -124,10 +197,29 @@ routing without making live API calls. Every tool, resource, and prompt was
 also manually verified against a real repo during development; see individual
 commit messages for what was and wasn't exercised against real data.
 
-## Notable things found during development
+## What we learned
 
-A few real issues surfaced by testing against live data instead of just
-mocks, worth knowing if you extend this:
+**About MCP as a protocol:**
+- It's JSON-RPC 2.0 underneath, nothing exotic - once you've seen the
+  `initialize` handshake and one `tools/call` round trip, you've seen the
+  shape of the whole protocol. Everything else is more of the same three
+  message types (tools, resources, prompts) repeated.
+- Tools, resources, and prompts are genuinely different primitives, not
+  three names for the same thing. Tools are actions the AI decides to
+  invoke; resources are addressable content the AI (or a human) can read
+  directly without a tool call; prompts are server-authored instructions
+  that tell the AI *which* tools to call and how - a reusable playbook,
+  not a data fetch. Building all three (not just tools, which is where
+  most examples stop) is what made the distinction click.
+- A server is trust-boundary-agnostic by default - it'll do whatever the
+  code allows. The allowlist pattern here (`config.ts` gating every
+  personal-scope tool) exists because MCP itself provides no scoping; the
+  server author has to build it.
+
+**About testing against real data instead of assuming code is correct:**
+Every tool, resource, and prompt was smoke-tested against a live repo
+during development, which surfaced real issues a "does it compile" check
+would have missed entirely:
 
 - **GitHub's code search doesn't index unstarred forks.** `search_code`
   returned 0 results with `incomplete_results: true` against a fresh fork -
@@ -142,6 +234,12 @@ mocks, worth knowing if you extend this:
   with `@octokit/plugin-throttling` broke `.d.ts` emission (TS2883). Fixed
   by dropping `declaration: true` from `tsconfig.json`, since this is a
   runnable server, not a library other packages import.
+- **A separate test tsconfig was needed.** The main `tsconfig.json`
+  excludes `test/` from compilation, so `tsc --noEmit` silently never
+  type-checked the test files - vitest's esbuild transform strips types
+  without checking them. `tsconfig.test.json` plus wiring `npm test` to
+  typecheck first caught real unsafe-property-access bugs in the tests
+  that were otherwise invisible.
 
 ## License
 
